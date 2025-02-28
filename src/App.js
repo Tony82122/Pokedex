@@ -262,7 +262,7 @@ function App() {
     return (
         <div style={styles.body}>
             <div style={styles.app}>
-                <h1>Pokedex</h1>
+                <h1>PokeMalarkey</h1>
                 <div style={styles.pokemonGrid}>
                     {pokemonData.map((pokemon) => (
                         <div
