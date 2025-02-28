@@ -5,7 +5,8 @@ const styles = {
         fontFamily: 'Arial, sans-serif',
         margin: 0,
         padding: 0,
-        backgroundColor: '#f0f0f0',
+        backgroundColor: '#eeeaea',
+        borderRadius : '50px',
     },
     app: {
         maxWidth: '1200px',
