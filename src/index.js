@@ -9,3 +9,4 @@ ReactDOM.render(
     </React.StrictMode>,
     document.getElementById('root')
 );
+// this is the main entry point it's responible for rendering the app

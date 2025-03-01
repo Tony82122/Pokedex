@@ -1,4 +1,5 @@
 import React, {useState} from 'react';
+// This defines the App structure
 
 const styles = {
     body: {

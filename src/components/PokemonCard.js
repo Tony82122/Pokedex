@@ -13,3 +13,5 @@ function PokemonCard({number, name, type, imageUrl}) {
 }
 
 export default PokemonCard;
+//  used in the main App or Pokedex component.
+// rendered in a loop, creating a card for each Pokemon.
