@@ -1,7 +1,9 @@
-import React, {useState} from 'react';
+import React, { useState } from 'react';
+import axios from 'axios';  // Add this import
+
 // This defines the App structure
 
-const styles = {
+const styles  = {
     body: {
         fontFamily: 'Arial, sans-serif',
         margin: 0,
@@ -56,11 +58,20 @@ const styles = {
         borderRadius: '10px',
         maxWidth: '400px',
         width: '100%',
+        overflowY: 'auto',
+        maxHeight: '80vh',
     },
     closeButton: {
         float: 'right',
         cursor: 'pointer',
         fontSize: '20px',
+    },
+    statsList: {
+        listStyleType: 'none',
+        padding: 0,
+    },
+    statItem: {
+        marginBottom: '5px',
     },
 };
 
@@ -87,6 +98,7 @@ const typeColors = {
 
 function App() {
     const [selectedPokemon, setSelectedPokemon] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const pokemonData = [
         {
@@ -253,8 +265,25 @@ function App() {
         },
     ];
 
-    const handlePokemonClick = (pokemon) => {
-        setSelectedPokemon(pokemon);
+    const handlePokemonClick = async (pokemon) => {
+        setLoading(true);
+        try {
+            const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.number}`);
+            const detailedPokemon = {
+                ...pokemon,
+                height: response.data.height,
+                weight: response.data.weight,
+                abilities: response.data.abilities.map(ability => ability.ability.name),
+                stats: response.data.stats.map(stat => ({
+                    name: stat.stat.name,
+                    value: stat.base_stat
+                }))
+            };
+            setSelectedPokemon(detailedPokemon);
+        } catch (error) {
+            console.error("Error fetching Pokemon details:", error);
+        }
+        setLoading(false);
     };
 
     const closeModal = () => {
@@ -288,15 +317,27 @@ function App() {
             </div>
             {selectedPokemon && (
                 <div style={styles.modal} onClick={closeModal}>
-                    <div style={styles.modalContent}
-                         onClick={(e) => e.stopPropagation()}>
-                        <span style={styles.closeButton}
-                              onClick={closeModal}>&times;</span>
-                        <h2>{selectedPokemon.name}</h2>
-                        <p>Number: {selectedPokemon.number}</p>
-                        <p>Type: {selectedPokemon.type}</p>
-                        <img src={selectedPokemon.imageUrl}
-                             alt={selectedPokemon.name} style={styles.image}/>
+                    <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                        <span style={styles.closeButton} onClick={closeModal}>&times;</span>
+                        {loading ? (
+                            <p>Loading...</p>
+                        ) : (
+                            <>
+                                <h2>{selectedPokemon.name}</h2>
+                                <p>Number: {selectedPokemon.number}</p>
+                                <p>Type: {selectedPokemon.type}</p>
+                                <img src={selectedPokemon.imageUrl} alt={selectedPokemon.name} style={styles.image}/>
+                                <p>Height: {selectedPokemon.height}</p>
+                                <p>Weight: {selectedPokemon.weight}</p>
+                                <p>Abilities: {selectedPokemon.abilities.join(', ')}</p>
+                                <h3>Stats:</h3>
+                                <ul style={styles.statsList}>
+                                    {selectedPokemon.stats.map((stat, index) => (
+                                        <li key={index} style={styles.statItem}>{stat.name}: {stat.value}</li>
+                                    ))}
+                                </ul>
+                            </>
+                        )}
                     </div>
                 </div>
             )}
