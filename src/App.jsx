@@ -51,6 +51,13 @@ const styles  = {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
+        opacity: 0,
+        visibility: 'hidden',
+        transition: 'opacity 0.3s ease, visibility 0.3s ease',
+    },
+    modalVisible: {
+        opacity: 1,
+        visibility: 'visible',
     },
     modalContent: {
         backgroundColor: 'white',
@@ -60,6 +67,13 @@ const styles  = {
         width: '100%',
         overflowY: 'auto',
         maxHeight: '80vh',
+        transform: 'scale(0.7)',
+        opacity: 0,
+        transition: 'transform 0.3s ease, opacity 0.3s ease',
+    },
+    modalContentVisible: {
+        transform: 'scale(1)',
+        opacity: 1,
     },
     closeButton: {
         float: 'right',
@@ -99,6 +113,7 @@ const typeColors = {
 function App() {
     const [selectedPokemon, setSelectedPokemon] = useState(null);
     const [loading, setLoading] = useState(false);
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
     const pokemonData = [
         {
@@ -267,6 +282,7 @@ function App() {
 
     const handlePokemonClick = async (pokemon) => {
         setLoading(true);
+        setIsModalVisible(true);
         try {
             const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.number}`);
             const detailedPokemon = {
@@ -287,7 +303,8 @@ function App() {
     };
 
     const closeModal = () => {
-        setSelectedPokemon(null);
+        setIsModalVisible(false);
+        setTimeout(() => setSelectedPokemon(null), 300); // Wait for transition to finish
     };
 
     return (
@@ -315,32 +332,42 @@ function App() {
                     ))}
                 </div>
             </div>
-            {selectedPokemon && (
-                <div style={styles.modal} onClick={closeModal}>
-                    <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
-                        <span style={styles.closeButton} onClick={closeModal}>&times;</span>
-                        {loading ? (
-                            <p>Loading...</p>
-                        ) : (
-                            <>
-                                <h2>{selectedPokemon.name}</h2>
-                                <p>Number: {selectedPokemon.number}</p>
-                                <p>Type: {selectedPokemon.type}</p>
-                                <img src={selectedPokemon.imageUrl} alt={selectedPokemon.name} style={styles.image}/>
-                                <p>Height: {selectedPokemon.height}</p>
-                                <p>Weight: {selectedPokemon.weight}</p>
-                                <p>Abilities: {selectedPokemon.abilities.join(', ')}</p>
-                                <h3>Stats:</h3>
-                                <ul style={styles.statsList}>
-                                    {selectedPokemon.stats.map((stat, index) => (
-                                        <li key={index} style={styles.statItem}>{stat.name}: {stat.value}</li>
-                                    ))}
-                                </ul>
-                            </>
-                        )}
-                    </div>
+            <div 
+                style={{
+                    ...styles.modal,
+                    ...(isModalVisible ? styles.modalVisible : {})
+                }} 
+                onClick={closeModal}
+            >
+                <div 
+                    style={{
+                        ...styles.modalContent,
+                        ...(isModalVisible ? styles.modalContentVisible : {})
+                    }} 
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <span style={styles.closeButton} onClick={closeModal}>&times;</span>
+                    {loading ? (
+                        <p>Loading...</p>
+                    ) : selectedPokemon && (
+                        <>
+                            <h2>{selectedPokemon.name}</h2>
+                            <p>Number: {selectedPokemon.number}</p>
+                            <p>Type: {selectedPokemon.type}</p>
+                            <img src={selectedPokemon.imageUrl} alt={selectedPokemon.name} style={styles.image}/>
+                            <p>Height: {selectedPokemon.height}</p>
+                            <p>Weight: {selectedPokemon.weight}</p>
+                            <p>Abilities: {selectedPokemon.abilities.join(', ')}</p>
+                            <h3>Stats:</h3>
+                            <ul style={styles.statsList}>
+                                {selectedPokemon.stats.map((stat, index) => (
+                                    <li key={index} style={styles.statItem}>{stat.name}: {stat.value}</li>
+                                ))}
+                            </ul>
+                        </>
+                    )}
                 </div>
-            )}
+            </div>
         </div>
     );
 }
