@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';  // Add this import
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import { HashRouter as Router, Route, Routes, Link } from 'react-router-dom';
 import Home from './Pages/Home';
 import About from './Pages/About';
 
