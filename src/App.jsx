@@ -1,5 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';  // Add this import
+import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom';
+import Home from './Pages/Home';
+import About from './Pages/About';
 
 // This defines the App structure
 
@@ -308,67 +311,87 @@ function App() {
     };
 
     return (
-        <div style={styles.body}>
-            <div style={styles.app}>
-                <h1>PokeMalarkey</h1>
-                <div style={styles.pokemonGrid}>
-                    {pokemonData.map((pokemon) => (
-                        <div
-                            key={pokemon.number}
-                            style={{
-                                ...styles.pokemonCard,
-                                backgroundColor: typeColors[pokemon.type.toLowerCase()],
-                            }}
-                            onClick={() => handlePokemonClick(pokemon)}
-                        >
-                            <div>
-                                <div
-                                    style={styles.number}>#{pokemon.number}</div>
-                                <div>{pokemon.name}</div>
+        <Router>
+            <div>
+                <nav>
+                    <ul>
+                        <li>
+                            <Link to="/">Home</Link>
+                        </li>
+                        <li>
+                            <Link to="/about">About</Link>
+                        </li>
+                    </ul>
+                </nav>
+
+                <Routes>
+                    <Route path="/" element={
+                        <div style={styles.body}>
+                            <div style={styles.app}>
+                                <h1>PokeMalarkey</h1>
+                                <div style={styles.pokemonGrid}>
+                                    {pokemonData.map((pokemon) => (
+                                        <div
+                                            key={pokemon.number}
+                                            style={{
+                                                ...styles.pokemonCard,
+                                                backgroundColor: typeColors[pokemon.type.toLowerCase()],
+                                            }}
+                                            onClick={() => handlePokemonClick(pokemon)}
+                                        >
+                                            <div>
+                                                <div
+                                                    style={styles.number}>#{pokemon.number}</div>
+                                                <div>{pokemon.name}</div>
+                                            </div>
+                                            <img src={pokemon.imageUrl} alt={pokemon.name}
+                                                 style={styles.image}/>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
-                            <img src={pokemon.imageUrl} alt={pokemon.name}
-                                 style={styles.image}/>
+                            <div 
+                                style={{
+                                    ...styles.modal,
+                                    ...(isModalVisible ? styles.modalVisible : {})
+                                }} 
+                                onClick={closeModal}
+                            >
+                                <div 
+                                    style={{
+                                        ...styles.modalContent,
+                                        ...(isModalVisible ? styles.modalContentVisible : {})
+                                    }} 
+                                    onClick={(e) => e.stopPropagation()}
+                                >
+                                    <span style={styles.closeButton} onClick={closeModal}>&times;</span>
+                                    {loading ? (
+                                        <p>Loading...</p>
+                                    ) : selectedPokemon && (
+                                        <>
+                                            <h2>{selectedPokemon.name}</h2>
+                                            <p>Number: {selectedPokemon.number}</p>
+                                            <p>Type: {selectedPokemon.type}</p>
+                                            <img src={selectedPokemon.imageUrl} alt={selectedPokemon.name} style={styles.image}/>
+                                            <p>Height: {selectedPokemon.height}</p>
+                                            <p>Weight: {selectedPokemon.weight}</p>
+                                            <p>Abilities: {selectedPokemon.abilities.join(', ')}</p>
+                                            <h3>Stats:</h3>
+                                            <ul style={styles.statsList}>
+                                                {selectedPokemon.stats.map((stat, index) => (
+                                                    <li key={index} style={styles.statItem}>{stat.name}: {stat.value}</li>
+                                                ))}
+                                            </ul>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
                         </div>
-                    ))}
-                </div>
+                    } />
+                    <Route path="/about" element={<About />} />
+                </Routes>
             </div>
-            <div 
-                style={{
-                    ...styles.modal,
-                    ...(isModalVisible ? styles.modalVisible : {})
-                }} 
-                onClick={closeModal}
-            >
-                <div 
-                    style={{
-                        ...styles.modalContent,
-                        ...(isModalVisible ? styles.modalContentVisible : {})
-                    }} 
-                    onClick={(e) => e.stopPropagation()}
-                >
-                    <span style={styles.closeButton} onClick={closeModal}>&times;</span>
-                    {loading ? (
-                        <p>Loading...</p>
-                    ) : selectedPokemon && (
-                        <>
-                            <h2>{selectedPokemon.name}</h2>
-                            <p>Number: {selectedPokemon.number}</p>
-                            <p>Type: {selectedPokemon.type}</p>
-                            <img src={selectedPokemon.imageUrl} alt={selectedPokemon.name} style={styles.image}/>
-                            <p>Height: {selectedPokemon.height}</p>
-                            <p>Weight: {selectedPokemon.weight}</p>
-                            <p>Abilities: {selectedPokemon.abilities.join(', ')}</p>
-                            <h3>Stats:</h3>
-                            <ul style={styles.statsList}>
-                                {selectedPokemon.stats.map((stat, index) => (
-                                    <li key={index} style={styles.statItem}>{stat.name}: {stat.value}</li>
-                                ))}
-                            </ul>
-                        </>
-                    )}
-                </div>
-            </div>
-        </div>
+        </Router>
     );
 }
 
