@@ -204,52 +204,60 @@ const typeColors = {
 };
 
 function App() {
-    const [selectedPokemon, setSelectedPokemon] = useState(null);
-    const [loading, setLoading] = useState(false);
-    const [isModalVisible, setIsModalVisible] = useState(false);
     const [pokemonData, setPokemonData] = useState([]);
+    const [loading, setLoading] = useState(true);
     const [currentPage, setCurrentPage] = useState(1);
-    const [totalPages, setTotalPages] = useState(0);
+    const [pokemonPerPage] = useState(20);
     const [searchTerm, setSearchTerm] = useState('');
-    const [isPrevHovered, setIsPrevHovered] = useState(false);
-    const [isNextHovered, setIsNextHovered] = useState(false);
-    const pokemonPerPage = 20;
+    const [selectedPokemon, setSelectedPokemon] = useState(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
     useEffect(() => {
-        fetchAllPokemon();
+        fetchPokemon();
     }, []);
 
-    const fetchAllPokemon = async () => {
-        setLoading(true);
+    const fetchPokemon = async () => {
         try {
-            const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=1000');
+            const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=151');
             const results = response.data.results;
-            setTotalPages(Math.ceil(results.length / pokemonPerPage));
-
-            const allPokemon = await Promise.all(
+            const pokemonDetails = await Promise.all(
                 results.map(async (pokemon) => {
-                    const detailResponse = await axios.get(pokemon.url);
+                    const res = await axios.get(pokemon.url);
                     return {
-                        number: String(detailResponse.data.id).padStart(3, '0'),
-                        name: detailResponse.data.name,
-                        type: detailResponse.data.types[0].type.name,
-                        imageUrl: detailResponse.data.sprites.front_default
+                        id: res.data.id,
+                        name: res.data.name,
+                        image: res.data.sprites.front_default,
+                        type: res.data.types[0].type.name,
                     };
                 })
             );
-
-            setPokemonData(allPokemon);
+            setPokemonData(pokemonDetails);
+            setLoading(false);
         } catch (error) {
             console.error("Error fetching Pokemon:", error);
+            setLoading(false);
         }
-        setLoading(false);
     };
+
+    const handleSearch = (event) => {
+        setSearchTerm(event.target.value.toLowerCase());
+        setCurrentPage(1);
+    };
+
+    const filteredPokemon = pokemonData.filter(pokemon =>
+        pokemon.name.toLowerCase().includes(searchTerm)
+    );
+
+    const indexOfLastPokemon = currentPage * pokemonPerPage;
+    const indexOfFirstPokemon = indexOfLastPokemon - pokemonPerPage;
+    const currentPokemon = filteredPokemon.slice(indexOfFirstPokemon, indexOfLastPokemon);
+
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     const handlePokemonClick = async (pokemon) => {
         setLoading(true);
-        setIsModalVisible(true);
         try {
-            const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`);
+            const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.id}`);
             const detailedPokemon = {
                 ...pokemon,
                 height: response.data.height,
@@ -261,6 +269,7 @@ function App() {
                 }))
             };
             setSelectedPokemon(detailedPokemon);
+            setIsModalVisible(true);
         } catch (error) {
             console.error("Error fetching Pokemon details:", error);
         } finally {
@@ -270,25 +279,8 @@ function App() {
 
     const closeModal = () => {
         setIsModalVisible(false);
-        setTimeout(() => setSelectedPokemon(null), 300);
+        setSelectedPokemon(null);
     };
-
-    const changePage = (newPage) => {
-        setCurrentPage(newPage);
-    };
-
-    const handleSearch = (event) => {
-        setSearchTerm(event.target.value.toLowerCase());
-    };
-
-    const filteredPokemon = pokemonData.filter(pokemon =>
-        pokemon.name.toLowerCase().includes(searchTerm)
-    );
-
-    const paginatedPokemon = filteredPokemon.slice(
-        (currentPage - 1) * pokemonPerPage,
-        currentPage * pokemonPerPage
-    );
 
     return (
         <Router>
@@ -322,88 +314,72 @@ function App() {
                             {loading ? (
                                 <p>Loading...</p>
                             ) : (
-                                <>
-                                    <div style={styles.pokemonGrid}>
-                                        {paginatedPokemon.map((pokemon) => (
-                                            <div
-                                                key={pokemon.number}
-                                                style={{
-                                                    ...styles.pokemonCard,
-                                                    backgroundColor: typeColors[pokemon.type.toLowerCase()],
-                                                }}
-                                                onClick={() => handlePokemonClick(pokemon)}
-                                            >
-                                                <div style={styles.number}>#{pokemon.number}</div>
-                                                <img src={pokemon.imageUrl} alt={pokemon.name} style={styles.image}/>
-                                                <div>{pokemon.name}</div>
-                                            </div>
-                                        ))}
-                                    </div>
-                                    <div style={styles.pagination}>
-                                        <button 
+                                <div style={styles.pokemonGrid}>
+                                    {currentPokemon.map((pokemon) => (
+                                        <div
+                                            key={pokemon.id}
                                             style={{
-                                                ...styles.button,
-                                                ...(isPrevHovered ? styles.buttonHover : {})
+                                                ...styles.pokemonCard,
+                                                backgroundColor: typeColors[pokemon.type.toLowerCase()],
                                             }}
-                                            onMouseEnter={() => setIsPrevHovered(true)}
-                                            onMouseLeave={() => setIsPrevHovered(false)}
-                                            onClick={() => changePage(currentPage - 1)} 
-                                            disabled={currentPage === 1}
+                                            onClick={() => handlePokemonClick(pokemon)}
                                         >
-                                            Previous
-                                        </button>
-                                        <span style={styles.paginationInfo}>{currentPage} of {Math.ceil(filteredPokemon.length / pokemonPerPage)}</span>
-                                        <button 
-                                            style={{
-                                                ...styles.button,
-                                                ...(isNextHovered ? styles.buttonHover : {})
-                                            }}
-                                            onMouseEnter={() => setIsNextHovered(true)}
-                                            onMouseLeave={() => setIsNextHovered(false)}
-                                            onClick={() => changePage(currentPage + 1)} 
-                                            disabled={currentPage === Math.ceil(filteredPokemon.length / pokemonPerPage)}
-                                        >
-                                            Next
-                                        </button>
-                                    </div>
-                                </>
+                                            <div style={styles.number}>#{String(pokemon.id).padStart(3, '0')}</div>
+                                            <img src={pokemon.image} alt={pokemon.name} style={styles.image}/>
+                                            <div>{pokemon.name}</div>
+                                        </div>
+                                    ))}
+                                </div>
                             )}
+                            <div style={styles.pagination}>
+                                <button
+                                    onClick={() => paginate(currentPage - 1)}
+                                    disabled={currentPage === 1}
+                                    style={styles.button}
+                                >
+                                    Previous
+                                </button>
+                                <span style={styles.paginationInfo}>
+                                    {currentPage} of {Math.ceil(filteredPokemon.length / pokemonPerPage)}
+                                </span>
+                                <button
+                                    onClick={() => paginate(currentPage + 1)}
+                                    disabled={indexOfLastPokemon >= filteredPokemon.length}
+                                    style={styles.button}
+                                >
+                                    Next
+                                </button>
+                            </div>
                         </div>
                     } />
                     <Route path="/about" element={<About />} />
                 </Routes>
 
-                {isModalVisible && (
+                {isModalVisible && selectedPokemon && (
                     <div style={styles.modal} onClick={closeModal}>
                         <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                             <span style={styles.closeButton} onClick={closeModal}>&times;</span>
-                            {loading ? (
-                                <p>Loading...</p>
-                            ) : selectedPokemon && (
-                                <>
-                                    <h2>{selectedPokemon.name}</h2>
-                                    <p>Number: {selectedPokemon.number}</p>
-                                    <p>Type: {selectedPokemon.type}</p>
-                                    <img src={selectedPokemon.imageUrl} alt={selectedPokemon.name} style={styles.image}/>
-                                    <p>Height: {selectedPokemon.height / 10} m</p>
-                                    <p>Weight: {selectedPokemon.weight / 10} kg</p>
-                                    <p>Abilities: {selectedPokemon.abilities.join(', ')}</p>
-                                    <h3>Stats:</h3>
-                                    <ul style={styles.statsList}>
-                                        {selectedPokemon.stats.map((stat, index) => (
-                                            <li key={index} style={styles.statItem}>
-                                                <span>{stat.name}: {stat.value}</span>
-                                                <div style={styles.statBar}>
-                                                    <div style={{
-                                                        ...styles.statBarFill,
-                                                        width: `${(stat.value / 255) * 100}%`
-                                                    }}></div>
-                                                </div>
-                                            </li>
-                                        ))}
-                                    </ul>
-                                </>
-                            )}
+                            <h2>{selectedPokemon.name}</h2>
+                            <p>Number: #{String(selectedPokemon.id).padStart(3, '0')}</p>
+                            <p>Type: {selectedPokemon.type}</p>
+                            <img src={selectedPokemon.image} alt={selectedPokemon.name} style={styles.image}/>
+                            <p>Height: {selectedPokemon.height / 10} m</p>
+                            <p>Weight: {selectedPokemon.weight / 10} kg</p>
+                            <p>Abilities: {selectedPokemon.abilities.join(', ')}</p>
+                            <h3>Stats:</h3>
+                            <ul style={styles.statsList}>
+                                {selectedPokemon.stats.map((stat, index) => (
+                                    <li key={index} style={styles.statItem}>
+                                        <span>{stat.name}: {stat.value}</span>
+                                        <div style={styles.statBar}>
+                                            <div style={{
+                                                ...styles.statBarFill,
+                                                width: `${(stat.value / 255) * 100}%`
+                                            }}></div>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
                     </div>
                 )}
