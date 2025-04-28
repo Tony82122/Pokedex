@@ -219,6 +219,7 @@ function App() {
                         name: res.data.name,
                         image: res.data.sprites.front_default,
                         type: res.data.types[0].type.name,
+                        stats: res.data.stats,
                     };
                 })
             );
@@ -340,6 +341,20 @@ function App() {
                             <p>Number: #{String(selectedPokemon.id).padStart(3, '0')}</p>
                             <p>Type: {selectedPokemon.type}</p>
                             <img src={selectedPokemon.image} alt={selectedPokemon.name} style={styles.image}/>
+                            <h3>Stats:</h3>
+                            <ul style={styles.statsList}>
+                                {selectedPokemon.stats.map((stat, index) => (
+                                    <li key={index} style={styles.statItem}>
+                                        <span>{stat.stat.name}: {stat.base_stat}</span>
+                                        <div style={styles.statBar}>
+                                            <div style={{
+                                                ...styles.statBarFill,
+                                                width: `${(stat.base_stat / 255) * 100}%`
+                                            }}></div>
+                                        </div>
+                                    </li>
+                                ))}
+                            </ul>
                         </div>
                     </div>
                 )}
