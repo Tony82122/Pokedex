@@ -217,30 +217,29 @@ function App() {
     const pokemonPerPage = 20;
 
     useEffect(() => {
-        fetchPokemon();
-    }, [currentPage]);
+        fetchAllPokemon();
+    }, []);
 
-    const fetchPokemon = async () => {
+    const fetchAllPokemon = async () => {
         setLoading(true);
         try {
-            const response = await axios.get(`https://pokeapi.co/api/v2/pokemon?limit=1000&offset=0`);
+            const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=1000');
             const results = response.data.results;
             setTotalPages(Math.ceil(results.length / pokemonPerPage));
 
-            const detailedPokemon = await Promise.all(
-                results.slice((currentPage - 1) * pokemonPerPage, currentPage * pokemonPerPage)
-                    .map(async (pokemon, index) => {
-                        const detailResponse = await axios.get(pokemon.url);
-                        return {
-                            number: String(detailResponse.data.id).padStart(3, '0'),
-                            name: detailResponse.data.name,
-                            type: detailResponse.data.types[0].type.name,
-                            imageUrl: detailResponse.data.sprites.front_default
-                        };
-                    })
+            const allPokemon = await Promise.all(
+                results.map(async (pokemon) => {
+                    const detailResponse = await axios.get(pokemon.url);
+                    return {
+                        number: String(detailResponse.data.id).padStart(3, '0'),
+                        name: detailResponse.data.name,
+                        type: detailResponse.data.types[0].type.name,
+                        imageUrl: detailResponse.data.sprites.front_default
+                    };
+                })
             );
 
-            setPokemonData(detailedPokemon);
+            setPokemonData(allPokemon);
         } catch (error) {
             console.error("Error fetching Pokemon:", error);
         }
@@ -286,6 +285,11 @@ function App() {
         pokemon.name.toLowerCase().includes(searchTerm)
     );
 
+    const paginatedPokemon = filteredPokemon.slice(
+        (currentPage - 1) * pokemonPerPage,
+        currentPage * pokemonPerPage
+    );
+
     return (
         <Router>
             <div style={styles.body}>
@@ -320,7 +324,7 @@ function App() {
                             ) : (
                                 <>
                                     <div style={styles.pokemonGrid}>
-                                        {filteredPokemon.map((pokemon) => (
+                                        {paginatedPokemon.map((pokemon) => (
                                             <div
                                                 key={pokemon.number}
                                                 style={{
@@ -348,7 +352,7 @@ function App() {
                                         >
                                             Previous
                                         </button>
-                                        <span style={styles.paginationInfo}>{currentPage} of {totalPages}</span>
+                                        <span style={styles.paginationInfo}>{currentPage} of {Math.ceil(filteredPokemon.length / pokemonPerPage)}</span>
                                         <button 
                                             style={{
                                                 ...styles.button,
@@ -357,7 +361,7 @@ function App() {
                                             onMouseEnter={() => setIsNextHovered(true)}
                                             onMouseLeave={() => setIsNextHovered(false)}
                                             onClick={() => changePage(currentPage + 1)} 
-                                            disabled={currentPage === totalPages}
+                                            disabled={currentPage === Math.ceil(filteredPokemon.length / pokemonPerPage)}
                                         >
                                             Next
                                         </button>
