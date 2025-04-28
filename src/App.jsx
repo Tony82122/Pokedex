@@ -360,8 +360,8 @@ function App() {
                 </Routes>
 
                 {isModalVisible && selectedPokemon && (
-                    <div style={styles.modal} onClick={closeModal}>
-                        <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                    <div style={{...styles.modal, display: 'flex'}} onClick={closeModal}>
+                        <div style={{...styles.modalContent, opacity: 1, transform: 'scale(1)'}} onClick={(e) => e.stopPropagation()}>
                             <span style={styles.closeButton} onClick={closeModal}>&times;</span>
                             <h2>{selectedPokemon.name}</h2>
                             <p>Number: #{String(selectedPokemon.id).padStart(3, '0')}</p>
