@@ -148,6 +148,39 @@ const styles = {
         alignItems: 'center',
         marginTop: '20px',
     },
+    button: {
+        backgroundColor: '#ffcb05',
+        color: '#3c5aa6',
+        border: 'none',
+        padding: '10px 20px',
+        margin: '0 10px',
+        borderRadius: '5px',
+        cursor: 'pointer',
+        fontWeight: 'bold',
+        transition: 'background-color 0.3s ease, color 0.3s ease',
+    },
+    buttonHover: {
+        backgroundColor: '#3c5aa6',
+        color: '#ffcb05',
+    },
+    searchBar: {
+        display: 'flex',
+        justifyContent: 'center',
+        marginBottom: '20px',
+    },
+    searchInput: {
+        padding: '10px',
+        fontSize: '16px',
+        border: '2px solid #3c5aa6',
+        borderRadius: '5px',
+        width: '300px',
+        maxWidth: '100%',
+    },
+    paginationInfo: {
+        margin: '0 20px',
+        fontSize: '18px',
+        fontWeight: 'bold',
+    },
 };
 
 const typeColors = {
@@ -178,6 +211,9 @@ function App() {
     const [pokemonData, setPokemonData] = useState([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [totalPages, setTotalPages] = useState(0);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [isPrevHovered, setIsPrevHovered] = useState(false);
+    const [isNextHovered, setIsNextHovered] = useState(false);
     const pokemonPerPage = 20;
 
     useEffect(() => {
@@ -242,6 +278,14 @@ function App() {
         setCurrentPage(newPage);
     };
 
+    const handleSearch = (event) => {
+        setSearchTerm(event.target.value.toLowerCase());
+    };
+
+    const filteredPokemon = pokemonData.filter(pokemon =>
+        pokemon.name.toLowerCase().includes(searchTerm)
+    );
+
     return (
         <Router>
             <div style={styles.body}>
@@ -262,12 +306,21 @@ function App() {
                 <Routes>
                     <Route path="/" element={
                         <div style={styles.app}>
+                            <div style={styles.searchBar}>
+                                <input
+                                    type="text"
+                                    placeholder="Search Pokemon"
+                                    value={searchTerm}
+                                    onChange={handleSearch}
+                                    style={styles.searchInput}
+                                />
+                            </div>
                             {loading ? (
                                 <p>Loading...</p>
                             ) : (
                                 <>
                                     <div style={styles.pokemonGrid}>
-                                        {pokemonData.map((pokemon) => (
+                                        {filteredPokemon.map((pokemon) => (
                                             <div
                                                 key={pokemon.number}
                                                 style={{
@@ -284,13 +337,25 @@ function App() {
                                     </div>
                                     <div style={styles.pagination}>
                                         <button 
+                                            style={{
+                                                ...styles.button,
+                                                ...(isPrevHovered ? styles.buttonHover : {})
+                                            }}
+                                            onMouseEnter={() => setIsPrevHovered(true)}
+                                            onMouseLeave={() => setIsPrevHovered(false)}
                                             onClick={() => changePage(currentPage - 1)} 
                                             disabled={currentPage === 1}
                                         >
                                             Previous
                                         </button>
-                                        <span>{currentPage} of {totalPages}</span>
+                                        <span style={styles.paginationInfo}>{currentPage} of {totalPages}</span>
                                         <button 
+                                            style={{
+                                                ...styles.button,
+                                                ...(isNextHovered ? styles.buttonHover : {})
+                                            }}
+                                            onMouseEnter={() => setIsNextHovered(true)}
+                                            onMouseLeave={() => setIsNextHovered(false)}
                                             onClick={() => changePage(currentPage + 1)} 
                                             disabled={currentPage === totalPages}
                                         >
