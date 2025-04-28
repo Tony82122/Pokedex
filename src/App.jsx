@@ -250,7 +250,7 @@ function App() {
         setLoading(true);
         setIsModalVisible(true);
         try {
-            const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.number}`);
+            const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.name}`);
             const detailedPokemon = {
                 ...pokemon,
                 height: response.data.height,
@@ -396,8 +396,8 @@ function App() {
                                 <p>Number: {selectedPokemon.number}</p>
                                 <p>Type: {selectedPokemon.type}</p>
                                 <img src={selectedPokemon.imageUrl} alt={selectedPokemon.name} style={styles.image}/>
-                                <p>Height: {selectedPokemon.height}</p>
-                                <p>Weight: {selectedPokemon.weight}</p>
+                                <p>Height: {selectedPokemon.height / 10} m</p>
+                                <p>Weight: {selectedPokemon.weight / 10} kg</p>
                                 <p>Abilities: {selectedPokemon.abilities.join(', ')}</p>
                                 <h3>Stats:</h3>
                                 <ul style={styles.statsList}>
