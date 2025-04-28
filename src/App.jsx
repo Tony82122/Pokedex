@@ -219,6 +219,7 @@ function App() {
     const fetchPokemon = async () => {
         try {
             const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=151');
+            console.log("API Response:", response.data);
             const results = response.data.results;
             const pokemonDetails = await Promise.all(
                 results.map(async (pokemon) => {
@@ -231,6 +232,7 @@ function App() {
                     };
                 })
             );
+            console.log("Processed Pokemon Data:", pokemonDetails);
             setPokemonData(pokemonDetails);
             setLoading(false);
         } catch (error) {
@@ -251,6 +253,8 @@ function App() {
     const indexOfLastPokemon = currentPage * pokemonPerPage;
     const indexOfFirstPokemon = indexOfLastPokemon - pokemonPerPage;
     const currentPokemon = filteredPokemon.slice(indexOfFirstPokemon, indexOfLastPokemon);
+
+    console.log("Current Pokemon to render:", currentPokemon);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
@@ -313,7 +317,7 @@ function App() {
                             </div>
                             {loading ? (
                                 <p>Loading...</p>
-                            ) : (
+                            ) : currentPokemon.length > 0 ? (
                                 <div style={styles.pokemonGrid}>
                                     {currentPokemon.map((pokemon) => (
                                         <div
@@ -330,6 +334,8 @@ function App() {
                                         </div>
                                     ))}
                                 </div>
+                            ) : (
+                                <p>No Pokemon found. Try adjusting your search or resetting the page.</p>
                             )}
                             <div style={styles.pagination}>
                                 <button
