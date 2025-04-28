@@ -89,9 +89,7 @@ const styles = {
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
-        opacity: 0,
-        visibility: 'hidden',
-        transition: 'opacity 0.3s ease, visibility 0.3s ease',
+        zIndex: 1000,
     },
     modalVisible: {
         opacity: 1,
@@ -105,6 +103,7 @@ const styles = {
         width: '90%',
         maxHeight: '80vh',
         overflowY: 'auto',
+        position: 'relative',
         transform: 'scale(0.7)',
         opacity: 0,
         transition: 'transform 0.3s ease, opacity 0.3s ease',
@@ -264,8 +263,9 @@ function App() {
             setSelectedPokemon(detailedPokemon);
         } catch (error) {
             console.error("Error fetching Pokemon details:", error);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const closeModal = () => {
@@ -373,50 +373,40 @@ function App() {
                     <Route path="/about" element={<About />} />
                 </Routes>
 
-                <div 
-                    style={{
-                        ...styles.modal,
-                        ...(isModalVisible ? styles.modalVisible : {})
-                    }} 
-                    onClick={closeModal}
-                >
-                    <div 
-                        style={{
-                            ...styles.modalContent,
-                            ...(isModalVisible ? styles.modalContentVisible : {})
-                        }} 
-                        onClick={(e) => e.stopPropagation()}
-                    >
-                        <span style={styles.closeButton} onClick={closeModal}>&times;</span>
-                        {loading ? (
-                            <p>Loading...</p>
-                        ) : selectedPokemon && (
-                            <>
-                                <h2>{selectedPokemon.name}</h2>
-                                <p>Number: {selectedPokemon.number}</p>
-                                <p>Type: {selectedPokemon.type}</p>
-                                <img src={selectedPokemon.imageUrl} alt={selectedPokemon.name} style={styles.image}/>
-                                <p>Height: {selectedPokemon.height / 10} m</p>
-                                <p>Weight: {selectedPokemon.weight / 10} kg</p>
-                                <p>Abilities: {selectedPokemon.abilities.join(', ')}</p>
-                                <h3>Stats:</h3>
-                                <ul style={styles.statsList}>
-                                    {selectedPokemon.stats.map((stat, index) => (
-                                        <li key={index} style={styles.statItem}>
-                                            <span>{stat.name}: {stat.value}</span>
-                                            <div style={styles.statBar}>
-                                                <div style={{
-                                                    ...styles.statBarFill,
-                                                    width: `${(stat.value / 255) * 100}%`
-                                                }}></div>
-                                            </div>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </>
-                        )}
+                {isModalVisible && (
+                    <div style={styles.modal} onClick={closeModal}>
+                        <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+                            <span style={styles.closeButton} onClick={closeModal}>&times;</span>
+                            {loading ? (
+                                <p>Loading...</p>
+                            ) : selectedPokemon && (
+                                <>
+                                    <h2>{selectedPokemon.name}</h2>
+                                    <p>Number: {selectedPokemon.number}</p>
+                                    <p>Type: {selectedPokemon.type}</p>
+                                    <img src={selectedPokemon.imageUrl} alt={selectedPokemon.name} style={styles.image}/>
+                                    <p>Height: {selectedPokemon.height / 10} m</p>
+                                    <p>Weight: {selectedPokemon.weight / 10} kg</p>
+                                    <p>Abilities: {selectedPokemon.abilities.join(', ')}</p>
+                                    <h3>Stats:</h3>
+                                    <ul style={styles.statsList}>
+                                        {selectedPokemon.stats.map((stat, index) => (
+                                            <li key={index} style={styles.statItem}>
+                                                <span>{stat.name}: {stat.value}</span>
+                                                <div style={styles.statBar}>
+                                                    <div style={{
+                                                        ...styles.statBarFill,
+                                                        width: `${(stat.value / 255) * 100}%`
+                                                    }}></div>
+                                                </div>
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </>
+                            )}
+                        </div>
                     </div>
-                </div>
+                )}
             </div>
         </Router>
     );
