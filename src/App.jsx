@@ -230,10 +230,6 @@ function App() {
                         name: res.data.name,
                         image: res.data.sprites.front_default,
                         type: res.data.types[0].type.name,
-                        stats: res.data.stats,
-                        height: res.data.height,
-                        weight: res.data.weight,
-                        abilities: res.data.abilities,
                     };
                 })
             );
@@ -262,6 +258,7 @@ function App() {
 
     const handlePokemonClick = (pokemon) => {
         console.log("Pokemon clicked:", pokemon);
+        alert(`You clicked on ${pokemon.name}`);
         setSelectedPokemon(pokemon);
         setIsModalVisible(true);
     };
@@ -311,10 +308,7 @@ function App() {
                                                 ...styles.pokemonCard,
                                                 backgroundColor: typeColors[pokemon.type.toLowerCase()],
                                             }}
-                                            onClick={() => {
-                                                console.log("Clicked on:", pokemon.name);
-                                                handlePokemonClick(pokemon);
-                                            }}
+                                            onClick={() => handlePokemonClick(pokemon)}
                                         >
                                             <div style={styles.number}>#{String(pokemon.id).padStart(3, '0')}</div>
                                             <img src={pokemon.image} alt={pokemon.name} style={styles.image}/>
@@ -357,28 +351,6 @@ function App() {
                             <p>Number: #{String(selectedPokemon.id).padStart(3, '0')}</p>
                             <p>Type: {selectedPokemon.type}</p>
                             <img src={selectedPokemon.image} alt={selectedPokemon.name} style={styles.image}/>
-                            <p>Height: {selectedPokemon.height / 10} m</p>
-                            <p>Weight: {selectedPokemon.weight / 10} kg</p>
-                            <h3>Abilities:</h3>
-                            <ul>
-                                {selectedPokemon.abilities.map((ability, index) => (
-                                    <li key={index}>{ability.ability.name}</li>
-                                ))}
-                            </ul>
-                            <h3>Stats:</h3>
-                            <ul style={styles.statsList}>
-                                {selectedPokemon.stats.map((stat, index) => (
-                                    <li key={index} style={styles.statItem}>
-                                        <span>{stat.stat.name}: {stat.base_stat}</span>
-                                        <div style={styles.statBar}>
-                                            <div style={{
-                                                ...styles.statBarFill,
-                                                width: `${(stat.base_stat / 255) * 100}%`
-                                            }}></div>
-                                        </div>
-                                    </li>
-                                ))}
-                            </ul>
                         </div>
                     </div>
                 )}
