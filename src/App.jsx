@@ -256,27 +256,11 @@ function App() {
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
-    const handlePokemonClick = async (pokemon) => {
-        setLoading(true);
-        try {
-            const response = await axios.get(`https://pokeapi.co/api/v2/pokemon/${pokemon.id}`);
-            const detailedPokemon = {
-                ...pokemon,
-                height: response.data.height,
-                weight: response.data.weight,
-                abilities: response.data.abilities.map(ability => ability.ability.name),
-                stats: response.data.stats.map(stat => ({
-                    name: stat.stat.name,
-                    value: stat.base_stat
-                }))
-            };
-            setSelectedPokemon(detailedPokemon);
-            setIsModalVisible(true);
-        } catch (error) {
-            console.error("Error fetching Pokemon details:", error);
-        } finally {
-            setLoading(false);
-        }
+    const handlePokemonClick = (pokemon) => {
+        console.log("Pokemon clicked:", pokemon);
+        alert(`You clicked on ${pokemon.name}`); // This will show a visible alert
+        setSelectedPokemon(pokemon);
+        setIsModalVisible(true);
     };
 
     const closeModal = () => {
@@ -324,7 +308,10 @@ function App() {
                                                 ...styles.pokemonCard,
                                                 backgroundColor: typeColors[pokemon.type.toLowerCase()],
                                             }}
-                                            onClick={() => handlePokemonClick(pokemon)}
+                                            onClick={() => {
+                                                console.log("Clicked on:", pokemon.name);
+                                                handlePokemonClick(pokemon);
+                                            }}
                                         >
                                             <div style={styles.number}>#{String(pokemon.id).padStart(3, '0')}</div>
                                             <img src={pokemon.image} alt={pokemon.name} style={styles.image}/>
@@ -360,30 +347,14 @@ function App() {
                 </Routes>
 
                 {isModalVisible && selectedPokemon && (
-                    <div style={{...styles.modal, display: 'flex'}} onClick={closeModal}>
+                    <div style={{...styles.modal, display: 'flex'}} onClick={() => setIsModalVisible(false)}>
                         <div style={{...styles.modalContent, opacity: 1, transform: 'scale(1)'}} onClick={(e) => e.stopPropagation()}>
                             <span style={styles.closeButton} onClick={closeModal}>&times;</span>
                             <h2>{selectedPokemon.name}</h2>
                             <p>Number: #{String(selectedPokemon.id).padStart(3, '0')}</p>
                             <p>Type: {selectedPokemon.type}</p>
                             <img src={selectedPokemon.image} alt={selectedPokemon.name} style={styles.image}/>
-                            <p>Height: {selectedPokemon.height / 10} m</p>
-                            <p>Weight: {selectedPokemon.weight / 10} kg</p>
-                            <p>Abilities: {selectedPokemon.abilities.join(', ')}</p>
-                            <h3>Stats:</h3>
-                            <ul style={styles.statsList}>
-                                {selectedPokemon.stats.map((stat, index) => (
-                                    <li key={index} style={styles.statItem}>
-                                        <span>{stat.name}: {stat.value}</span>
-                                        <div style={styles.statBar}>
-                                            <div style={{
-                                                ...styles.statBarFill,
-                                                width: `${(stat.value / 255) * 100}%`
-                                            }}></div>
-                                        </div>
-                                    </li>
-                                ))}
-                            </ul>
+                            {/* Add more details here if needed */}
                         </div>
                     </div>
                 )}
