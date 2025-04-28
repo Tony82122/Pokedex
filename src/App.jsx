@@ -118,7 +118,7 @@ const styles = {
         top: '10px',
         right: '15px',
         cursor: 'pointer',
-        fontSize: '24px',
+        fontSize: '24px',np
         color: '#333',
     },
     statsList: {
