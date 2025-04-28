@@ -247,7 +247,7 @@ function App() {
 
     const handlePokemonClick = (pokemon) => {
         console.log("Pokemon clicked:", pokemon);
-        alert(`You clicked on ${pokemon.name}`);
+
         setSelectedPokemon(pokemon);
         setIsModalVisible(true);
     };
@@ -261,7 +261,7 @@ function App() {
         <Router>
             <div style={styles.body}>
                 <header style={styles.header}>
-                    <h1 style={styles.title}>PokeMalarkey</h1>
+                    <h1 style={styles.title}>Pokedex!</h1>
                 </header>
                 <nav style={styles.nav}>
                     <ul style={styles.navList}>
