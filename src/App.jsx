@@ -211,15 +211,16 @@ function App() {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedPokemon, setSelectedPokemon] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
+    const [totalPokemon, setTotalPokemon] = useState(0);
 
     useEffect(() => {
-        fetchPokemon();
+        fetchAllPokemon();
     }, []);
 
-    const fetchPokemon = async () => {
+    const fetchAllPokemon = async () => {
         try {
-            const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=151');
-            console.log("API Response:", response.data);
+            const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=1500');
+            setTotalPokemon(response.data.count);
             const results = response.data.results;
             const pokemonDetails = await Promise.all(
                 results.map(async (pokemon) => {
@@ -232,7 +233,6 @@ function App() {
                     };
                 })
             );
-            console.log("Processed Pokemon Data:", pokemonDetails);
             setPokemonData(pokemonDetails);
             setLoading(false);
         } catch (error) {
@@ -253,8 +253,6 @@ function App() {
     const indexOfLastPokemon = currentPage * pokemonPerPage;
     const indexOfFirstPokemon = indexOfLastPokemon - pokemonPerPage;
     const currentPokemon = filteredPokemon.slice(indexOfFirstPokemon, indexOfLastPokemon);
-
-    console.log("Current Pokemon to render:", currentPokemon);
 
     const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
