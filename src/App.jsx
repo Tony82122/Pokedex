@@ -90,13 +90,6 @@ const styles = {
         justifyContent: 'center',
         alignItems: 'center',
         zIndex: 1000,
-        opacity: 0,
-        visibility: 'hidden',
-        transition: 'opacity 0.3s ease, visibility 0.3s ease',
-    },
-    modalVisible: {
-        opacity: 1,
-        visibility: 'visible',
     },
     modalContent: {
         backgroundColor: 'white',
@@ -107,14 +100,7 @@ const styles = {
         maxHeight: '80vh',
         overflowY: 'auto',
         position: 'relative',
-        transform: 'scale(0.7)',
-        opacity: 0,
-        transition: 'transform 0.3s ease, opacity 0.3s ease',
         boxShadow: '0 5px 15px rgba(0,0,0,0.3)',
-    },
-    modalContentVisible: {
-        transform: 'scale(1)',
-        opacity: 1,
     },
     closeButton: {
         position: 'absolute',
@@ -214,7 +200,6 @@ function App() {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedPokemon, setSelectedPokemon] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
-    const [modalContentVisible, setModalContentVisible] = useState(false);
     const [totalPokemon, setTotalPokemon] = useState(0);
 
     useEffect(() => {
@@ -262,17 +247,14 @@ function App() {
 
     const handlePokemonClick = (pokemon) => {
         console.log("Pokemon clicked:", pokemon);
+        alert(`You clicked on ${pokemon.name}`);
         setSelectedPokemon(pokemon);
         setIsModalVisible(true);
-        setTimeout(() => setModalContentVisible(true), 50);
     };
 
     const closeModal = () => {
-        setModalContentVisible(false);
-        setTimeout(() => {
-            setIsModalVisible(false);
-            setSelectedPokemon(null);
-        }, 300);
+        setIsModalVisible(false);
+        setSelectedPokemon(null);
     };
 
     return (
@@ -351,20 +333,8 @@ function App() {
                 </Routes>
 
                 {isModalVisible && selectedPokemon && (
-                    <div 
-                        style={{
-                            ...styles.modal, 
-                            ...(isModalVisible ? styles.modalVisible : {})
-                        }} 
-                        onClick={closeModal}
-                    >
-                        <div 
-                            style={{
-                                ...styles.modalContent, 
-                                ...(modalContentVisible ? styles.modalContentVisible : {})
-                            }} 
-                            onClick={(e) => e.stopPropagation()}
-                        >
+                    <div style={{...styles.modal, display: 'flex'}} onClick={() => setIsModalVisible(false)}>
+                        <div style={styles.modalContent} onClick={(e) => e.stopPropagation()}>
                             <span style={styles.closeButton} onClick={closeModal}>&times;</span>
                             <h2>{selectedPokemon.name}</h2>
                             <p>Number: #{String(selectedPokemon.id).padStart(3, '0')}</p>
