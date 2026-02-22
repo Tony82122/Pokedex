@@ -2,22 +2,32 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 /**
- * Custom hook to fetch and manage Pokemon data
+ * Custom hook to fetch and manage Pokemon data with batch loading
  * @returns {Object} Pokemon data state and loading status
  */
 export const usePokemon = () => {
     const [pokemonData, setPokemonData] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
     const [error, setError] = useState(null);
+    const [hasMore, setHasMore] = useState(true);
+    const [currentOffset, setCurrentOffset] = useState(0);
+
+    const BATCH_SIZE = 50;
+    const TOTAL_POKEMON = 1025;
 
     useEffect(() => {
-        fetchAllPokemon();
+        fetchPokemonBatch(0);
     }, []);
 
-    const fetchAllPokemon = async () => {
+    const fetchPokemonBatch = async (offset) => {
         try {
-            setLoading(true);
-            const response = await axios.get('https://pokeapi.co/api/v2/pokemon?limit=1500');
+            if (offset === 0) setLoading(true);
+            else setIsLoadingMore(true);
+
+            const response = await axios.get(
+                `https://pokeapi.co/api/v2/pokemon?limit=${BATCH_SIZE}&offset=${offset}`
+            );
             const results = response.data.results;
 
             const pokemonDetails = await Promise.all(
@@ -37,16 +47,42 @@ export const usePokemon = () => {
                 })
             );
 
-            setPokemonData(pokemonDetails);
-            setLoading(false);
+            setPokemonData(prev => [...prev, ...pokemonDetails]);
+            setCurrentOffset(offset + BATCH_SIZE);
+            setHasMore(offset + BATCH_SIZE < TOTAL_POKEMON);
+
+            if (offset === 0) setLoading(false);
+            else setIsLoadingMore(false);
         } catch (err) {
             console.error("Error fetching Pokemon:", err);
             setError(err.message);
-            setLoading(false);
+            if (offset === 0) setLoading(false);
+            else setIsLoadingMore(false);
         }
     };
 
-    return { pokemonData, loading, error, refetch: fetchAllPokemon };
+    const loadMorePokemon = () => {
+        if (hasMore && !isLoadingMore) {
+            fetchPokemonBatch(currentOffset);
+        }
+    };
+
+    const refetch = () => {
+        setPokemonData([]);
+        setCurrentOffset(0);
+        setHasMore(true);
+        fetchPokemonBatch(0);
+    };
+
+    return {
+        pokemonData,
+        loading,
+        isLoadingMore,
+        error,
+        hasMore,
+        loadMorePokemon,
+        refetch
+    };
 };
 
 /**
