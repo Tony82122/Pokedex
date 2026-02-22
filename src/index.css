@@ -1,4 +1,3 @@
-/* Global Styles and Animations */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
 
 * {
@@ -13,12 +12,10 @@ body {
     -moz-osx-font-smoothing: grayscale;
 }
 
-/* Smooth scrolling */
 html {
     scroll-behavior: smooth;
 }
 
-/* Custom scrollbar */
 ::-webkit-scrollbar {
     width: 12px;
 }
@@ -37,7 +34,6 @@ html {
     background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
 }
 
-/* Animations */
 @keyframes fadeIn {
     from {
         opacity: 0;
@@ -80,7 +76,6 @@ html {
     }
 }
 
-/* Loading animation */
 .loading-spinner {
     display: inline-block;
     width: 50px;
@@ -97,20 +92,17 @@ html {
     }
 }
 
-/* Selection styles */
 ::selection {
     background-color: rgba(102, 126, 234, 0.3);
     color: white;
 }
 
-/* Focus styles for accessibility */
 button:focus,
 input:focus {
     outline: 3px solid rgba(102, 126, 234, 0.5);
     outline-offset: 2px;
 }
 
-/* Responsive adjustments */
 @media (max-width: 768px) {
     body {
         font-size: 14px;
