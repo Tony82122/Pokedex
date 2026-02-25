@@ -52,14 +52,7 @@ const HomePage: React.FC = () => {
 
             {currentItems.length > 0 ? (
                 <>
-                    <div
-                        style={{
-                            display: 'grid',
-                            gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
-                            gap: '30px',
-                            padding: '30px 0',
-                        }}
-                    >
+                    <div style={styles.gridContainer}>
                         {currentItems.map((pokemon: Pokemon) => (
                             <PokemonCard
                                 key={pokemon.id}
@@ -79,20 +72,13 @@ const HomePage: React.FC = () => {
                     />
 
                     {hasMore && (
-                        <div style={{ textAlign: 'center', padding: '30px 0' }}>
+                        <div style={styles.loadMoreContainer}>
                             <button
                                 onClick={loadMorePokemon}
                                 disabled={isLoadingMore}
                                 style={{
-                                    padding: '12px 30px',
-                                    fontSize: '16px',
-                                    backgroundColor: '#667eea',
-                                    color: 'white',
-                                    border: 'none',
-                                    borderRadius: '8px',
-                                    cursor: isLoadingMore ? 'not-allowed' : 'pointer',
-                                    opacity: isLoadingMore ? 0.6 : 1,
-                                    transition: 'all 0.3s ease',
+                                    ...styles.loadMoreButton,
+                                    ...(isLoadingMore ? styles.loadMoreButtonDisabled : {}),
                                 }}
                                 onMouseEnter={(e) => {
                                     const t = e.currentTarget as HTMLButtonElement;
@@ -124,4 +110,3 @@ const HomePage: React.FC = () => {
 };
 
 export default HomePage;
-

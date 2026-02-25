@@ -1,4 +1,4 @@
-// Pokemon type color gradients
+// Pokémon type color gradients
 export const typeColors = {
     grass: 'linear-gradient(135deg, #78C850 0%, #5ca935 100%)',
     fire: 'linear-gradient(135deg, #F08030 0%, #dd6610 100%)',
@@ -136,5 +136,72 @@ export const styles: { [key: string]: React.CSSProperties } = {
         cursor: 'not-allowed',
         filter: 'none',
         boxShadow: 'none',
+    },
+    gridContainer: {
+        display: 'grid',
+        gridTemplateColumns: 'repeat(auto-fill, minmax(240px, 1fr))',
+        gap: '30px',
+        padding: '30px 0',
+    },
+    loadMoreContainer: {
+        textAlign: 'center',
+        padding: '30px 0',
+    },
+    loadMoreButton: {
+        padding: '12px 30px',
+        fontSize: '16px',
+        backgroundColor: '#667eea',
+        color: 'white',
+        border: 'none',
+        borderRadius: '8px',
+        cursor: 'pointer',
+        opacity: 1,
+        transition: 'all 0.3s ease',
+    },
+    loadMoreButtonHover: {
+        backgroundColor: '#764ba2',
+    },
+    loadMoreButtonDisabled: {
+        cursor: 'not-allowed',
+        opacity: 0.6,
+    },
+    aboutContainer: {
+        maxWidth: 800,
+        margin: '40px auto',
+        padding: '40px 32px',
+        background: 'rgba(255,255,255,0.97)',
+        borderRadius: '24px',
+        boxShadow: '0 8px 32px rgba(0,0,0,0.18)',
+        border: '4px solid #a3bffa',
+    },
+    aboutTitle: {
+        fontSize: '2.8em',
+        fontWeight: 700,
+        color: '#222',
+        marginBottom: 24,
+        textAlign: 'center',
+        letterSpacing: '1px',
+    },
+    aboutParagraph: {
+        fontSize: '1.18em',
+        lineHeight: 1.7,
+        color: '#555',
+        marginBottom: 28,
+        textAlign: 'center',
+        fontWeight: 400,
+    },
+    aboutSectionTitle: {
+        fontSize: '1.6em',
+        fontWeight: 700,
+        color: '#667eea',
+        margin: '32px 0 16px 0',
+        letterSpacing: '1px',
+    },
+    aboutList: {
+        fontSize: '1.1em',
+        lineHeight: 1.8,
+        color: '#444',
+        marginLeft: 24,
+        marginBottom: 16,
     },
 };
